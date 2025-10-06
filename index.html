@@ -1,200 +1,217 @@
 <!DOCTYPE html>
 <html lang="fi">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Korttipeli – oma artistinen sivu</title>
+  <title>Portfolio</title>
+  <meta name="description" content="Tumma luxe-kortti UI: 4 peruskorttia (♠ ♥ ♦ ♣), flip ja linkit projekteihin. Taustalla valkoinen Matrix‑tyylinen kirjainsade. GitHub Pages -yhteensopiva (HTML+CSS+JS)." />
   <style>
     :root{
-      --bg: #0b0f14;
-      --ink: #e6e8eb;
-      --muted: #9aa3ad;
-      --accent: #e4572e;
-      --accent-2:#5dade2;
-      --card:#11161d;
-      --card-edge:#263241;
-      --shadow: rgba(0,0,0,.45);
+      --bg:#0a0d10;
+      --ink:#e8eaee;
+      --muted:#a7b0bc;
+      --silver:#cfd6e3;
+      --silver-d:#9aa3ad;
+      --card:#0b0e12;
+      --edge:#2a3340;
+      --scan:#b9c4d6;
     }
-    html,body{height:100%;}
+    *{box-sizing:border-box}
+    html,body{height:100%}
     body{
-      margin:0; font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, Apple Color Emoji, Segoe UI Emoji;
-      background: radial-gradient(1200px 800px at 70% -10%, #16202b, var(--bg));
-      color:var(--ink);
-      display:flex; flex-direction:column; gap:24px;
-    }
-    header{
-      padding:28px 24px 0; text-align:center;
-    }
-    h1{
-      margin:0; font-weight:800; letter-spacing:.5px; font-size: clamp(24px, 4vw, 40px);
-    }
-    p.lead{margin:.35rem 0 0; color:var(--muted)}
-
-    .app{max-width:1000px; margin:0 auto; padding: 10px 24px 48px;}
-
-    .controls{
-      display:flex; flex-wrap:wrap; gap:12px; justify-content:center; margin:12px 0 18px;
-    }
-    button{
-      appearance:none; border:none; padding:12px 16px; border-radius:14px; background:linear-gradient(180deg,#1a2634,#10161f);
-      color:var(--ink); box-shadow: 0 6px 18px var(--shadow), inset 0 0 0 1px var(--card-edge);
-      font-weight:700; letter-spacing:.25px; cursor:pointer; transition: transform .06s ease, filter .2s ease, box-shadow .2s ease;
-    }
-    button:hover{ filter:brightness(1.06);}
-    button:active{ transform: translateY(1px) scale(.99);}
-
-    .board{
-      display:grid; grid-template-columns: 1fr; gap:22px;
+      margin:0; font-family: Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Noto Sans JP", Apple Color Emoji, Segoe UI Emoji;
+      color:var(--ink); background: radial-gradient(1200px 800px at 75% -10%, #121722, var(--bg));
     }
 
-    .zone{
-      background: linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.02));
-      border-radius: 20px; padding:18px; box-shadow: inset 0 0 0 1px var(--card-edge), 0 10px 30px var(--shadow);
-    }
-    .zone h2{ margin:0 0 10px; font-size:14px; letter-spacing:1px; text-transform:uppercase; color:var(--muted); }
+    /* --- MATRIX RAIN (canvas) behind everything --- */
+    #matrixCanvas{ position:fixed; inset:0; z-index:0; pointer-events:none; }
 
-    .cards{
-      display:grid; grid-template-columns: repeat(auto-fill, minmax(88px, 1fr)); gap:12px;
-    }
+    header{ position:relative; z-index:1; max-width:1100px; margin:0 auto; padding:40px 24px 16px; text-align:center; }
+    h1{ margin:0; font-weight:800; letter-spacing:.3px; font-size: clamp(24px, 4vw, 40px); }
+    p.lead{ margin:.5rem auto 0; color:var(--muted); max-width:800px; }
 
-    .card{
-      aspect-ratio: 5/7; border-radius: 16px; background: radial-gradient(400px 240px at 50% -40%, #1a2430, var(--card));
-      position:relative; user-select:none; cursor:pointer; transform: translateZ(0);
-      box-shadow: 0 10px 30px var(--shadow), inset 0 0 0 1px var(--card-edge);
-      transition: transform .18s cubic-bezier(.2,.8,.2,1), box-shadow .18s ease, filter .2s ease;
-    }
-    .card:hover{ transform: translateY(-4px) rotate(-.3deg); filter:brightness(1.04); box-shadow: 0 18px 40px var(--shadow), inset 0 0 0 1px #3b4a5f; }
-    .card.selected{ outline: 3px solid var(--accent-2); box-shadow: 0 18px 40px var(--shadow), 0 0 0 4px rgba(93,173,226,.25) inset; }
+    main{ position:relative; z-index:1; max-width:1100px; margin:0 auto; padding:24px; display:grid; gap:28px; }
 
-    .pip, .rank{
-      position:absolute; font-weight:900; text-shadow: 0 2px 8px rgba(0,0,0,.4);
-    }
-    .rank{ top:10px; left:10px; font-size:20px; }
-    .pip{ right:10px; bottom:10px; font-size:22px; }
+    /* --- 4-card grid --- */
+    .stage{ display:grid; gap:22px; }
+    .cards-row{ display:grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap:22px; justify-items:center; }
 
-    .heart,.diamond{ color:var(--accent); }
-    .spade,.club{ color:#c2d3e7; }
+    .card{ --w: clamp(220px, 30vw, 280px); width:var(--w); aspect-ratio:5/7; position:relative; border-radius:18px; cursor:pointer; perspective: 1200px; isolation:isolate; }
+    .card .inner{ position:absolute; inset:0; border-radius:inherit; transform-style:preserve-3d; transition: transform .85s cubic-bezier(.2,.7,.2,1), box-shadow .35s; box-shadow: 0 18px 50px rgba(0,0,0,.45), inset 0 0 0 1px var(--edge); }
+    .card:hover .inner{ box-shadow: 0 26px 80px rgba(0,0,0,.6), inset 0 0 0 1px #3a4a61; }
+    .card.flipped .inner{ transform: rotateY(180deg); }
 
-    .deck-count{ color:var(--muted); font-size:12px; margin-left:8px; }
+    .face{ position:absolute; inset:0; border-radius:inherit; backface-visibility:hidden; overflow:hidden; }
 
-    footer{opacity:.8; text-align:center; font-size:12px; padding-bottom:24px; color:var(--muted)}
+    /* front (symbol side) */
+    .front{ background: radial-gradient(600px 300px at 50% -30%, #141a24, var(--card)); display:grid; place-items:center; }
+    .front::before, .back::before{ content:""; position:absolute; inset:0; padding:2px; border-radius:inherit; background: conic-gradient(from 180deg, var(--silver), var(--silver-d), #ffffff, var(--silver), var(--silver-d), var(--silver)); -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor; mask-composite: exclude; pointer-events:none; }
 
-    @media(min-width:860px){
-      .board{ grid-template-columns: 1fr 1fr; }
-    }
+    .symbol{ width:64%; max-width:240px; }
+.symbol svg{ width:100%; height:auto; display:block; }
+.symbol svg *{ fill: var(--silver); stroke: none; }
+/* SUIT MASKS (Twemoji) */
+.suit-mask{ width:64%; max-width:240px; aspect-ratio:1/1; background: var(--silver); }
+.suit-mask{ -webkit-mask-repeat:no-repeat; mask-repeat:no-repeat; -webkit-mask-position:center; mask-position:center; -webkit-mask-size:contain; mask-size:contain; }
+.spade-mask{ -webkit-mask-image:url("https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/svg/2660.svg"); mask-image:url("https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/svg/2660.svg"); }
+.heart-mask{ -webkit-mask-image:url("https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/svg/2665.svg"); mask-image:url("https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/svg/2665.svg"); }
+.diamond-mask{ -webkit-mask-image:url("https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/svg/2666.svg"); mask-image:url("https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/svg/2666.svg"); }
+.club-mask{ -webkit-mask-image:url("https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/svg/2663.svg"); mask-image:url("https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/svg/2663.svg"); }
+    .symbol svg{ width:100%; height:auto; display:block; }
+    .symbol svg *{ fill: var(--silver); stroke: none; }
+
+    /* back (text + link) */
+    .back{ background: radial-gradient(600px 300px at 50% -30%, #121722, #0b0e12); transform: rotateY(180deg); display:grid; place-items:center; padding:18px; text-align:center; }
+    .back .content{ max-width:90%; }
+    .back h3{ margin:.25rem 0 .25rem; font-size:1.05rem; }
+    .back p{ margin:.25rem 0 .75rem; color:var(--muted); font-size:.95rem; }
+    .btn{ appearance:none; border:none; padding:10px 14px; border-radius:12px; background:linear-gradient(180deg,#1a2634,#10161f); color:var(--ink); font-weight:700; cursor:pointer; box-shadow: 0 6px 18px rgba(0,0,0,.45), inset 0 0 0 1px var(--edge); text-decoration:none; display:inline-block; }
+    .btn:active{ transform: translateY(1px); }
+
+    footer{ position:relative; z-index:1; text-align:center; color:var(--muted); font-size:.9rem; padding:28px 0 40px; }
+
+    @media (prefers-reduced-motion: reduce){ .card .inner{ transition:none; } }
   </style>
+  <!-- Google-fontti, jotta katakana-merkistö näkyy varmasti -->
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700&display=swap" rel="stylesheet">
 </head>
 <body>
+  <!-- MATRIX canvas behind cards -->
+  <canvas id="matrixCanvas" aria-hidden="true"></canvas>
+
   <header>
-    <h1>Artistinen korttisivu</h1>
-    <p class="lead">GitHub Pages -yhteensopiva, täysin staattinen (HTML+CSS+JS). Voit nostaa kortteja ja rakentaa tästä oman pelin.</p>
+    <h1>Projektit</h1>
+    <p class="lead">Neljä luxe‑korttia (♠ ♥ ♦ ♣). Klikkaa korttia → flip → lyhyt kuvaus → linkki projektiin. Taustalla valkoinen Matrix‑kirjainsade, joka ei peitä kortteja.</p>
   </header>
 
-  <main class="app">
-    <div class="controls">
-      <button id="shuffle">Sekoita pakka</button>
-      <button id="draw1">Nosta 1</button>
-      <button id="draw5">Nosta 5</button>
-      <button id="reset">Palauta kaikki</button>
-      <span class="deck-count" id="deckCount"></span>
-    </div>
+  <main>
+    <section class="stage" aria-label="Kortit">
+      <div class="cards-row">
+        <!-- ♠ Spade / Projekti A -->
+        <article class="card" data-link="https://github.com/Ka-Q/Kirja-arkisto">
+          <div class="inner">
+            <div class="face front">
+              <div class="symbol suit-mask spade-mask" aria-hidden="true"></div>
+            </div>
+            <div class="face back">
+              <div class="content">
+                <h3>Projekti A</h3>
+                <p>Mustan ja hopean typografinen juliste.</p>
+                <a class="btn" href="https://github.com/Ka-Q/Kirja-arkisto" target="_blank" rel="noopener">Avaa projekti</a>
+              </div>
+            </div>
+          </div>
+        </article>
 
-    <section class="board">
-      <div class="zone">
-        <h2>Pakka</h2>
-        <div id="deck" class="cards" aria-live="polite"></div>
+        <!-- ♥ Heart / Projekti B -->
+        <article class="card" data-link="https://example.com/projekti-b">
+          <div class="inner">
+            <div class="face front">
+              <div class="symbol suit-mask heart-mask" aria-hidden="true"></div>
+            </div>
+            <div class="face back">
+              <div class="content">
+                <h3>Projekti B</h3>
+                <p>Interaktiivinen korttianimaatio.</p>
+                <a class="btn" href="https://example.com/projekti-b" target="_blank" rel="noopener">Avaa projekti</a>
+              </div>
+            </div>
+          </div>
+        </article>
+
+        <!-- ♦ Diamond / Projekti C -->
+        <article class="card" data-link="https://example.com/projekti-c">
+          <div class="inner">
+            <div class="face front">
+              <div class="symbol suit-mask diamond-mask" aria-hidden="true"></div>
+            </div>
+            <div class="face back">
+              <div class="content">
+                <h3>Projekti C</h3>
+                <p>SVG‑viivakuvitus, stroke‑animointi.</p>
+                <a class="btn" href="https://example.com/projekti-c" target="_blank" rel="noopener">Avaa projekti</a>
+              </div>
+            </div>
+          </div>
+        </article>
+
+        <!-- ♣ Club / Projekti D -->
+        <article class="card" data-link="https://example.com/projekti-d">
+          <div class="inner">
+            <div class="face front">
+              <div class="symbol suit-mask club-mask" aria-hidden="true"></div>
+            </div>
+            <div class="face back">
+              <div class="content">
+                <h3>Projekti D</h3>
+                <p>3D‑käännöt ja siirtymät.</p>
+                <a class="btn" href="https://example.com/projekti-d" target="_blank" rel="noopener">Avaa projekti</a>
+              </div>
+            </div>
+          </div>
+        </article>
       </div>
-      <div class="zone">
-        <h2>Käsi</h2>
-        <div id="hand" class="cards" aria-live="polite"></div>
-      </div>
+      <p class="lead" style="text-align:center;">Klikkaa korttia nähdäksesi kuvauksen ja linkin projektiin.</p>
     </section>
   </main>
 
-  <footer>
-    ✦ Vinkki: voit lisätä pisteytyksen, sääntölogiikan ja animaatiot laajentamalla tätä.
-  </footer>
+  <footer>© <span id="year"></span> Border Luxe – HTML+CSS+JS (GitHub Pages)</footer>
 
   <script>
-    // --- Util ---
-    const SUITS = [
-      { key:'♠', cls:'spade' },
-      { key:'♥', cls:'heart' },
-      { key:'♦', cls:'diamond' },
-      { key:'♣', cls:'club' },
-    ];
-    const RANKS = ['A','2','3','4','5','6','7','8','9','10','J','Q','K'];
+    // YEAR
+    document.getElementById('year').textContent = new Date().getFullYear();
 
-    function newDeck(){
-      const d=[]; let id=0;
-      for(const s of SUITS){
-        for(const r of RANKS){ d.push({ id:id++, suit:s.key, suitCls:s.cls, rank:r }); }
+    // MATRIX RAIN (white letters), behind cards
+    const canvas = document.getElementById('matrixCanvas');
+    const ctx = canvas.getContext('2d');
+    let W, H, fontSize, columns, drops, chars;
+
+    function initMatrix(){
+      W = canvas.width = window.innerWidth; H = canvas.height = window.innerHeight;
+      fontSize = 16; // adjust for density
+      columns = Math.floor(W / fontSize);
+      drops = Array(columns).fill(0);
+      // Matrix-tyylinen merkistö: katakana + täysleveät numerot + muutama symboli
+      const katakana = 'アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲンヴヵヶァィゥェォッャュョ';
+      const fullDigits = '０１２３４５６７８９';
+      const symbols = '・＝＋－＊／｜＞＜（）〔〕｛｝';
+      chars = (katakana + fullDigits + symbols).split('');
+    }
+
+    function drawMatrix(t){
+      if(!drawMatrix.last) drawMatrix.last = t;
+      const RAIN_STEP_MS = 80; // ↑ suurempi = hitaampi sade
+      if(t - drawMatrix.last < RAIN_STEP_MS){ requestAnimationFrame(drawMatrix); return; }
+      drawMatrix.last = t;
+      // translucent background for trail
+      ctx.fillStyle = 'rgba(10,13,16,0.25)';
+      ctx.fillRect(0,0,W,H);
+      ctx.fillStyle = 'rgba(255,255,255,0.75)';
+      ctx.font = fontSize + 'px "Noto Sans JP", monospace';
+      for(let i=0;i<columns;i++){
+        const text = chars[Math.floor(Math.random()*chars.length)];
+        const x = i * fontSize;
+        const y = drops[i] * fontSize;
+        ctx.fillText(text, x, y);
+        if(y > H && Math.random() > 0.985){ drops[i] = 0; }
+        drops[i]++;
       }
-      return d;
+      requestAnimationFrame(drawMatrix);
     }
 
-    function shuffle(arr){
-      // Fisher–Yates
-      for(let i=arr.length-1;i>0;i--){
-        const j = Math.floor(Math.random()*(i+1));
-        [arr[i],arr[j]]=[arr[j],arr[i]];
-      }
-      return arr;
-    }
+    initMatrix();
+    requestAnimationFrame(drawMatrix);
+    window.addEventListener('resize', initMatrix);
 
-    // --- App state ---
-    let deck = shuffle(newDeck());
-    let hand = [];
-
-    // --- DOM helpers ---
-    const deckEl = document.getElementById('deck');
-    const handEl = document.getElementById('hand');
-    const deckCountEl = document.getElementById('deckCount');
-
-    function cardEl(card, selectable=true){
-      const el = document.createElement('div');
-      el.className = 'card';
-      el.dataset.id = card.id;
-      el.innerHTML = `<div class="rank ${card.suitCls}">${card.rank}</div><div class="pip ${card.suitCls}">${card.suit}</div>`;
-      if(selectable){
-        el.addEventListener('click',()=>{
-          el.classList.toggle('selected');
-        });
-      }
-      return el;
-    }
-
-    function render(){
-      deckEl.innerHTML='';
-      handEl.innerHTML='';
-      deck.forEach(c=> deckEl.appendChild(cardEl(c,false)));
-      hand.forEach(c=> handEl.appendChild(cardEl(c,true)));
-      deckCountEl.textContent = `Kortteja pakassa: ${deck.length}`;
-    }
-
-    function draw(n=1){
-      const taken = deck.splice(0, n);
-      hand.push(...taken);
-      render();
-    }
-
-    // --- Controls ---
-    document.getElementById('shuffle').addEventListener('click',()=>{
-      deck = shuffle(deck.concat(hand));
-      hand = [];
-      render();
+    // CARD FLIP logic (no game, just flip + link)
+    document.querySelectorAll('.card').forEach(card => {
+      card.addEventListener('click', (e)=>{
+        // if back's button was clicked, let anchor handle it
+        if(e.target.closest('a')) return;
+        // flip
+        card.classList.toggle('flipped');
+      });
     });
-
-    document.getElementById('draw1').addEventListener('click',()=>draw(1));
-    document.getElementById('draw5').addEventListener('click',()=>draw(5));
-
-    document.getElementById('reset').addEventListener('click',()=>{
-      deck = shuffle(newDeck());
-      hand = [];
-      render();
-    });
-
-    render();
   </script>
 </body>
 </html>
