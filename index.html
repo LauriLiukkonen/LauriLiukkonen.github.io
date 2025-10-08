@@ -45,7 +45,7 @@
 
     /* front (symbol side) */
     .front{ background: radial-gradient(600px 300px at 50% -30%, #141a24, var(--card)); display:grid; place-items:center; }
-    .front::before, .back::before{ content:""; position:absolute; inset:0; padding:2px; border-radius:inherit; background: conic-gradient(from 180deg, var(--silver), var(--silver-d), #ffffff, var(--silver), var(--silver-d), var(--silver)); -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor; mask-composite: exclude; pointer-events:none; }
+    .front::before, .back::before{ content:""; position:absolute; inset:0; padding:2px; border-radius:inherit; background: conic-gradient(from 180deg, var(--silver), var(--silver-d), #ffffff, var(--silver), var(--silver-d), var(--silver)); -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor; mask-composite: exclude; pointer-events:none; }
 
     .symbol{ width:64%; max-width:240px; }
 .symbol svg{ width:100%; height:auto; display:block; }
@@ -81,7 +81,6 @@
 
   <header>
     <h1>Projektit</h1>
-    <p class="lead">Neljä luxe‑korttia (♠ ♥ ♦ ♣). Klikkaa korttia → flip → lyhyt kuvaus → linkki projektiin. Taustalla valkoinen Matrix‑kirjainsade, joka ei peitä kortteja.</p>
   </header>
 
   <main>
@@ -95,8 +94,8 @@
             </div>
             <div class="face back">
               <div class="content">
-                <h3>Projekti A</h3>
-                <p>Mustan ja hopean typografinen juliste.</p>
+                <h3>Kirja-arkisto</h3>
+                <p>Ohjelmistotekniikka 2</p>
                 <a class="btn" href="https://github.com/Ka-Q/Kirja-arkisto" target="_blank" rel="noopener">Avaa projekti</a>
               </div>
             </div>
@@ -104,7 +103,7 @@
         </article>
 
         <!-- ♥ Heart / Projekti B -->
-        <article class="card" data-link="https://example.com/projekti-b">
+        <article class="card" data-link="https://github.com/LauriLiukkonen/Virtualitylabs">
           <div class="inner">
             <div class="face front">
               <div class="symbol suit-mask heart-mask" aria-hidden="true"></div>
@@ -113,7 +112,7 @@
               <div class="content">
                 <h3>Projekti B</h3>
                 <p>Interaktiivinen korttianimaatio.</p>
-                <a class="btn" href="https://example.com/projekti-b" target="_blank" rel="noopener">Avaa projekti</a>
+                <a class="btn" href="https://github.com/LauriLiukkonen/Virtualitylabs" target="_blank" rel="noopener">Avaa projekti</a>
               </div>
             </div>
           </div>
@@ -175,7 +174,7 @@
       const katakana = 'アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲンヴヵヶァィゥェォッャュョ';
       const fullDigits = '０１２３４５６７８９';
       const symbols = '・＝＋－＊／｜＞＜（）〔〕｛｝';
-      chars = (katakana + fullDigits + symbols).split('');
+      chars = (katakana + alphabet + fullDigits + symbols).split('');
     }
 
     function drawMatrix(t){
