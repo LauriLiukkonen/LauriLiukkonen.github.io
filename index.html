@@ -72,7 +72,7 @@
 
     @media (prefers-reduced-motion: reduce){ .card .inner{ transition:none; } }
   </style>
-  <!-- Google-fontti, jotta katakana-merkistö näkyy varmasti -->
+  <!-- Google-font, to matrix-katakana -->
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700&display=swap" rel="stylesheet">
 </head>
 <body>
@@ -96,7 +96,7 @@
               <div class="content">
                 <h3>Kirja-arkisto</h3>
                 <p>Ohjelmistotekniikka 2</p>
-                <a class="btn" href="https://github.com/Ka-Q/Kirja-arkisto" target="_blank" rel="noopener">Avaa projekti</a>
+                <a class="btn" href="https://github.com/Ka-Q/Kirja-arkisto" target="_blank" rel="noopener">Github</a>
               </div>
             </div>
           </div>
@@ -110,9 +110,9 @@
             </div>
             <div class="face back">
               <div class="content">
-                <h3>Projekti B</h3>
-                <p>Interaktiivinen korttianimaatio.</p>
-                <a class="btn" href="https://github.com/LauriLiukkonen/Virtualitylabs" target="_blank" rel="noopener">Avaa projekti</a>
+                <h3>Virtuality labs</h3>
+                <p>Ohjelmistotuotanto 3</p>
+                <a class="btn" href="https://github.com/LauriLiukkonen/Virtualitylabs" target="_blank" rel="noopener">GitHub</a>
               </div>
             </div>
           </div>
@@ -127,40 +127,38 @@
             <div class="face back">
               <div class="content">
                 <h3>Projekti C</h3>
-                <p>SVG‑viivakuvitus, stroke‑animointi.</p>
-                <a class="btn" href="https://example.com/projekti-c" target="_blank" rel="noopener">Avaa projekti</a>
+                <p>Laravel-projekti</p>
+                <a class="btn" href="https://example.com/projekti-c" target="_blank" rel="noopener">Github</a>
               </div>
             </div>
           </div>
         </article>
 
         <!-- ♣ Club / Projekti D -->
-        <article class="card" data-link="https://example.com/projekti-d">
+        <article class="card" data-link="https://github.com/mliuha/Mokkivarausjarjestelma2">
           <div class="inner">
             <div class="face front">
               <div class="symbol suit-mask club-mask" aria-hidden="true"></div>
             </div>
             <div class="face back">
               <div class="content">
-                <h3>Projekti D</h3>
-                <p>3D‑käännöt ja siirtymät.</p>
-                <a class="btn" href="https://example.com/projekti-d" target="_blank" rel="noopener">Avaa projekti</a>
+                <h3>Mökkivarausjärjestelmä</h3>
+                <p>Ohjelmistotuotanto 1</p>
+                <a class="btn" href="https://github.com/mliuha/Mokkivarausjarjestelma2" target="_blank" rel="noopener">Github</a>
               </div>
             </div>
           </div>
         </article>
       </div>
-      <p class="lead" style="text-align:center;">Klikkaa korttia nähdäksesi kuvauksen ja linkin projektiin.</p>
+      
     </section>
   </main>
 
-  <footer>© <span id="year"></span> Border Luxe – HTML+CSS+JS (GitHub Pages)</footer>
+  
 
   <script>
-    // YEAR
-    document.getElementById('year').textContent = new Date().getFullYear();
-
-    // MATRIX RAIN (white letters), behind cards
+    
+    // MATRIX RAIN
     const canvas = document.getElementById('matrixCanvas');
     const ctx = canvas.getContext('2d');
     let W, H, fontSize, columns, drops, chars;
@@ -202,7 +200,7 @@
     requestAnimationFrame(drawMatrix);
     window.addEventListener('resize', initMatrix);
 
-    // CARD FLIP logic (no game, just flip + link)
+    // CARD FLIP logic
     document.querySelectorAll('.card').forEach(card => {
       card.addEventListener('click', (e)=>{
         // if back's button was clicked, let anchor handle it
